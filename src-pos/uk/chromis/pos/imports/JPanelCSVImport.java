@@ -607,8 +607,11 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
      * @param pType
      */
     public void createProduct(String pType) {
+        // JDB - This is horrible code that relies on static array indexes
+        // The code needs changing to an array of objects containing key/value pairs
+        
 // create a new product and save it using DalaLogicSales
-        Object[] myprod = new Object[25];
+        Object[] myprod = new Object[29];
         myprod[0] = UUID.randomUUID().toString();                               // ID string
         myprod[1] = productReference;                                           // Reference string
         myprod[2] = productBarcode;                                             // Barcode String        
@@ -621,8 +624,8 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         myprod[9] = taxcatmodel.getSelectedKey();                               // Tax string
         myprod[10] = null;                                                      // Attributeset string
         myprod[11] = null;                                                      // Image
-        myprod[12] = null;                                                      // Stock cost double
-        myprod[13] = null;                                                      // Stock volume double
+        myprod[12] = (double) 0;                                                      // Stock cost double
+        myprod[13] = (double) 0;                                                      // Stock volume double
         myprod[14] = jCheckInCatalogue.isSelected();           // In catalog flag
         myprod[15] = null;                                                      // catalog order        
         myprod[16] = null;                                                      //
@@ -636,7 +639,9 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         myprod[24] = 0.0;                                                       // StockUnits
         myprod[25] = "";                                                        // Alias
         myprod[26] = false;                                                     // AlwaysAvailable flag
-        try {
+        myprod[27] = "";                                                        // Discounted
+        myprod[28] = false;                                                     // Can Discount
+              try {
             if ("new".equals(pType)) {
                 spr.insertData(myprod);
             } else {
