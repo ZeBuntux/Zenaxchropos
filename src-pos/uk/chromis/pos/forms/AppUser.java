@@ -245,6 +245,7 @@ public class AppUser {
         m_oldclasses.put("net.adrianromero.tpv.reports.JReportInventory2", "/uk/chromis/reports/inventoryb.bs");
         m_oldclasses.put("net.adrianromero.tpv.reports.JReportInventoryBroken", "/uk/chromis/reports/inventorybroken.bs");
         m_oldclasses.put("net.adrianromero.tpv.reports.JReportInventoryDiff", "/uk/chromis/reports/inventorydiff.bs");
+        m_oldclasses.put("net.adrianromero.tpv.reports.JReportInventoryReOrder", "/uk/chromis/reports/inventoryreorder.bs");
 
         m_oldclasses.put("Menu.SalesManagement", "uk.chromis.pos.forms.MenuSalesManagement");
         m_oldclasses.put("net.adrianromero.tpv.reports.JReportUserSales", "/uk/chromis/reports/usersales.bs");
@@ -279,6 +280,7 @@ public class AppUser {
         m_oldclasses.put("uk.chromis.pos.reports.JReportInventory2", "/uk/chromis/reports/inventoryb.bs");
         m_oldclasses.put("uk.chromis.pos.reports.JReportInventoryBroken", "/uk/chromis/reports/inventorybroken.bs");
         m_oldclasses.put("uk.chromis.pos.reports.JReportInventoryDiff", "/uk/chromis/reports/inventorydiff.bs");
+        m_oldclasses.put("uk.chromis.pos.reports.JReportInventoryReOrder", "/uk/chromis/reports/inventoryreorder.bs");
         m_oldclasses.put("uk.chromis.pos.reports.JReportPeople", "/uk/chromis/reports/people.bs");
         m_oldclasses.put("uk.chromis.pos.reports.JReportTaxes", "/uk/chromis/reports/taxes.bs");
         m_oldclasses.put("uk.chromis.pos.reports.JReportUserSales", "/uk/chromis/reports/usersales.bs");
