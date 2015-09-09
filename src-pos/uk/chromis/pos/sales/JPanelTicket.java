@@ -1598,7 +1598,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
 
 // JG May 2013 replaced with Multicatch
         } catch (JRException | IOException | ClassNotFoundException e) {
-            MessageInf msg = new MessageInf(MessageInf.SGN_WARNING, AppLocal.getIntString("message.cannotloadreport"), e);
+            MessageInf msg = new MessageInf(MessageInf.SGN_WARNING, resourcefile + ": " + AppLocal.getIntString("message.cannotloadreport"), e);
             msg.show(this);
         }
     }
