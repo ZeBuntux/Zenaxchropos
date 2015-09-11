@@ -611,7 +611,7 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         // The code needs changing to an array of objects containing key/value pairs
         
 // create a new product and save it using DalaLogicSales
-        Object[] myprod = new Object[29];
+        Object[] myprod = new Object[32];
         myprod[0] = UUID.randomUUID().toString();                               // ID string
         myprod[1] = productReference;                                           // Reference string
         myprod[2] = productBarcode;                                             // Barcode String        
@@ -641,6 +641,9 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         myprod[26] = false;                                                     // AlwaysAvailable flag
         myprod[27] = "";                                                        // Discounted
         myprod[28] = false;                                                     // Can Discount
+        myprod[29] = false;                                                     // Is a pack
+        myprod[30] = (double)0;                                                 // PackQuantity
+        myprod[31] = null;                                                     // Pack Product
               try {
             if ("new".equals(pType)) {
                 spr.insertData(myprod);

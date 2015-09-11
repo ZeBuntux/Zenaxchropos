@@ -260,7 +260,7 @@ public class JRootApp extends JPanel implements AppView {
                     } catch (DatabaseException ex) {
                         Logger.getLogger(JRootApp.class.getName()).log(Level.SEVERE, null, ex);
                     } catch (LiquibaseException ex) {
-                        MessageInf msg = new MessageInf(MessageInf.SGN_NOTICE, "Liquibase Error", ex.getCause().toString().replace("liquibase.exception.DatabaseException:", ""));
+                        MessageInf msg = new MessageInf(MessageInf.SGN_NOTICE, "Liquibase Error in " + changelog, ex.getCause().toString().replace("liquibase.exception.DatabaseException:", ""));
                         msg.show(this);
                     } catch (MalformedURLException ex) {
                         Logger.getLogger(JRootApp.class.getName()).log(Level.SEVERE, null, ex);
