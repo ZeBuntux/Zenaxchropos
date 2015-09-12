@@ -805,7 +805,7 @@ public class DataLogicSales extends BeanFactoryDataSingle {
                 + "STOCKCURRENT.UNITS, "             //21
                 + "ALIAS, " //22
                 + "ALWAYSAVAILABLE, " //23 
-                + "DISCOUNTED, CANDISCOUNT "
+                + "DISCOUNTED, CANDISCOUNT, "
                 + "ISPACK, PACKQUANTITY, PACKPRODUCT "
                 + "FROM STOCKCURRENT RIGHT OUTER JOIN PRODUCTS ON (STOCKCURRENT.PRODUCT = PRODUCTS.ID) "
                 + "WHERE ISCOM = " + s.DB.FALSE() + " AND ?(QBF_FILTER) "
@@ -845,7 +845,7 @@ public class DataLogicSales extends BeanFactoryDataSingle {
                 + "STOCKCURRENT.UNITS, "             //21
                 + "ALIAS, " //22
                 + "ALWAYSAVAILABLE, " //23  
-                + "DISCOUNTED, CANDISCOUNT "
+                + "DISCOUNTED, CANDISCOUNT, "
                 + "ISPACK, PACKQUANTITY, PACKPRODUCT "
                 + "FROM STOCKCURRENT RIGHT OUTER JOIN PRODUCTS ON (STOCKCURRENT.PRODUCT = PRODUCTS.ID) "
                 + "WHERE ISCOM = " + s.DB.TRUE() + " AND ?(QBF_FILTER) "
