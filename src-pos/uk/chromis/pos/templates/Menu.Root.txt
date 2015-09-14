@@ -56,6 +56,7 @@ group = menu.addGroup("Menu.Backoffice");
         submenu.addPanel("/uk/chromis/images/attributes.png", "Menu.AttributeUse", "uk.chromis.pos.inventory.AttributeUsePanel");
         submenu.addPanel("/uk/chromis/images/stockdiary.png", "Menu.StockDiary", "uk.chromis.pos.inventory.StockDiaryPanel");
         submenu.addPanel("/uk/chromis/images/stockmaint.png", "Menu.StockMovement", "uk.chromis.pos.inventory.StockManagement");
+        submenu.addPanel("/uk/chromis/images/products.png", "Menu.ProductPacks", "uk.chromis.pos.inventory.ProductPacksPanel");
 
     submenu.addTitle("Menu.StockManagement.Reports");
         submenu.addPanel("/uk/chromis/images/reports.png", "Menu.BarcodeSheet", "/uk/chromis/reports/barcodesheet.bs");
@@ -65,6 +66,7 @@ group = menu.addGroup("Menu.Backoffice");
         submenu.addPanel("/uk/chromis/images/reports.png", "Menu.InventoryDiff", "/uk/chromis/reports/inventorydiff.bs");
         submenu.addPanel("/uk/chromis/images/reports.png", "Menu.InventoryDiffDetail", "/uk/chromis/reports/inventorydiffdetail.bs");
         submenu.addPanel("/uk/chromis/images/reports.png", "Menu.InventoryListDetail", "/uk/chromis/reports/inventorylistdetail.bs");
+        submenu.addPanel("/uk/chromis/images/reports.png", "Menu.InventoryReOrder", "/uk/chromis/reports/inventoryreorder.bs");
         submenu.addPanel("/uk/chromis/images/reports.png", "Menu.ProductCatalog", "/uk/chromis/reports/productscatalog.bs");
         submenu.addPanel("/uk/chromis/images/reports.png", "Menu.Products", "/uk/chromis/reports/products.bs");
         submenu.addPanel("/uk/chromis/images/reports.png", "Menu.ProductLabels", "/uk/chromis/reports/productlabels.bs");

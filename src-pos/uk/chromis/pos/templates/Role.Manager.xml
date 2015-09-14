@@ -90,6 +90,7 @@
     <class name="uk.chromis.pos.inventory.ProductsWarehousePanel"/>
     <class name="uk.chromis.pos.inventory.StockDiaryPanel"/>
     <class name="uk.chromis.pos.inventory.StockManagement"/>
+    <class name="uk.chromis.pos.inventory.ProductPacksPanel"/>
     <class name="uk.chromis.pos.inventory.TaxCategoriesPanel"/>
     <class name="uk.chromis.pos.inventory.TaxCustCategoriesPanel"/>
     <class name="uk.chromis.pos.inventory.TaxPanel"/>
@@ -101,6 +102,7 @@
             <class name="/uk/chromis/reports/inventorydiff.bs"/>
             <class name="/uk/chromis/reports/inventorydiffdetail.bs"/>
             <class name="/uk/chromis/reports/inventorylistdetail.bs"/>
+            <class name="/uk/chromis/reports/inventoryreorder.bs"/>
             <class name="/uk/chromis/reports/productscatalog.bs"/>
             <class name="/uk/chromis/reports/products.bs"/>
             <class name="/uk/chromis/reports/productlabels.bs"/>

@@ -493,7 +493,7 @@ public class JPrincipalApp extends javax.swing.JPanel implements AppUserView {
                 try {
                     m_jMyView.activate();
                 } catch (BasicException e) {
-                    JMessageDialog.showMessage(this, new MessageInf(MessageInf.SGN_WARNING, AppLocal.getIntString("message.notactive"), e));            
+                    JMessageDialog.showMessage(this, new MessageInf(MessageInf.SGN_WARNING, AppLocal.getIntString("message.notactive") + " " + sTaskClass , e));            
                 }
 
                 m_jLastView = m_jMyView;
@@ -509,7 +509,7 @@ public class JPrincipalApp extends javax.swing.JPanel implements AppUserView {
             }
         } else  {
 
-            JMessageDialog.showMessage(this, new MessageInf(MessageInf.SGN_WARNING, AppLocal.getIntString("message.notpermissions")));            
+            JMessageDialog.showMessage(this, new MessageInf(MessageInf.SGN_WARNING, AppLocal.getIntString("message.notpermissions") + " " + sTaskClass ));            
         }
         m_appview.waitCursorEnd();       
     }
@@ -536,10 +536,10 @@ public class JPrincipalApp extends javax.swing.JPanel implements AppUserView {
                     JMessageDialog.showMessage(JPrincipalApp.this, new MessageInf(eb));            
                 }
             } catch (BeanFactoryException e) {
-                JMessageDialog.showMessage(JPrincipalApp.this, new MessageInf(MessageInf.SGN_WARNING, AppLocal.getIntString("Label.LoadError"), e));            
+                JMessageDialog.showMessage(JPrincipalApp.this, new MessageInf(MessageInf.SGN_WARNING, AppLocal.getIntString("Label.LoadError") + " " + sTaskClass , e));            
             }                    
         } else  {
-            JMessageDialog.showMessage(JPrincipalApp.this, new MessageInf(MessageInf.SGN_WARNING, AppLocal.getIntString("message.notpermissions")));            
+            JMessageDialog.showMessage(JPrincipalApp.this, new MessageInf(MessageInf.SGN_WARNING, AppLocal.getIntString("message.notpermissions") + " " + sTaskClass ));            
         }
         m_appview.waitCursorEnd();    
     }

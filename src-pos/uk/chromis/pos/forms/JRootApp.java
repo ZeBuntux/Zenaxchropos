@@ -260,7 +260,7 @@ public class JRootApp extends JPanel implements AppView {
                     } catch (DatabaseException ex) {
                         Logger.getLogger(JRootApp.class.getName()).log(Level.SEVERE, null, ex);
                     } catch (LiquibaseException ex) {
-                        MessageInf msg = new MessageInf(MessageInf.SGN_NOTICE, "Liquibase Error", ex.getCause().toString().replace("liquibase.exception.DatabaseException:", ""));
+                        MessageInf msg = new MessageInf(MessageInf.SGN_NOTICE, "Liquibase Error in " + changelog, ex.getCause().toString().replace("liquibase.exception.DatabaseException:", ""));
                         msg.show(this);
                     } catch (MalformedURLException ex) {
                         Logger.getLogger(JRootApp.class.getName()).log(Level.SEVERE, null, ex);
@@ -633,6 +633,7 @@ public class JRootApp extends JPanel implements AppView {
         m_oldclasses.put("uk.chromis.pos.reports.JReportInventory2", "/uk/chromis/reports/inventoryb.bs");
         m_oldclasses.put("uk.chromis.pos.reports.JReportInventoryBroken", "/uk/chromis/reports/inventorybroken.bs");
         m_oldclasses.put("uk.chromis.pos.reports.JReportInventoryDiff", "/uk/chromis/reports/inventorydiff.bs");
+        m_oldclasses.put("uk.chromis.pos.reports.JReportInventoryReOrder", "/uk/chromis/reports/inventoryreorder.bs");
         m_oldclasses.put("uk.chromis.pos.reports.JReportPeople", "/uk/chromis/reports/people.bs");
         m_oldclasses.put("uk.chromis.pos.reports.JReportTaxes", "/uk/chromis/reports/taxes.bs");
         m_oldclasses.put("uk.chromis.pos.reports.JReportUserSales", "/uk/chromis/reports/usersales.bs");
