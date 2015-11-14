@@ -18,6 +18,7 @@
 //    along with Chromis POS.  If not, see <http://www.gnu.org/licenses/>.
 //    CSV Import Panel added by JDL - February 2013
 //    Additonal library required - javacsv
+
 package uk.chromis.pos.imports;
 
 import com.csvreader.CsvReader;
@@ -26,7 +27,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
@@ -46,8 +46,6 @@ import uk.chromis.data.gui.ComboBoxValModel;
 import uk.chromis.data.loader.DataResultSet;
 import uk.chromis.data.loader.Datas;
 import uk.chromis.data.loader.PreparedSentence;
-import uk.chromis.data.loader.SentenceExec;
-import uk.chromis.data.loader.SentenceExecTransaction;
 import uk.chromis.data.loader.SentenceList;
 import uk.chromis.data.loader.SerializerWriteBasicExt;
 import uk.chromis.data.loader.Session;
@@ -57,11 +55,9 @@ import uk.chromis.pos.forms.AppConfig;
 import uk.chromis.pos.forms.AppLocal;
 import uk.chromis.pos.forms.AppProperties;
 import uk.chromis.pos.forms.AppView;
-import uk.chromis.pos.forms.AppViewConnection;
 import uk.chromis.pos.forms.DataLogicSales;
 import uk.chromis.pos.forms.DataLogicSystem;
 import uk.chromis.pos.forms.JPanelView;
-import uk.chromis.pos.inventory.ProductsWarehousePanel;
 import uk.chromis.pos.inventory.TaxCategoryInfo;
 import uk.chromis.pos.sales.TaxesLogic;
 import uk.chromis.pos.ticket.ProductInfoExt;
@@ -83,7 +79,7 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
 
     private AppView m_App;
     private AppProperties m_props;
-    
+
     private ArrayList<String> Headers = new ArrayList<>();
     private Session s;
     private Connection con;
@@ -103,9 +99,6 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
     private DataLogicSales m_dlSales;
     private DataLogicSystem m_dlSystem;
 
-    /**
-     *
-     */
     protected SaveProvider spr;
     private String productReference;
     private String productBarcode;
@@ -134,7 +127,7 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
     private int noChanges = 0;
     private int badPrice = 0;
     private double dTaxRate;
-    
+
     // Addtional Items
     private String buttonText;
     private String remotePrint;
@@ -145,6 +138,9 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
     private String prop;
     private String aux;
     private String shortName;
+    private String isPack;
+    private Double packSize;
+    private String packOf;
 
     /**
      * Constructs a new JPanelCSVImport object
@@ -155,7 +151,7 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
 
         m_App = app;
         m_props = m_App.getProperties();
-        
+
         initComponents();
 
         /*
@@ -242,7 +238,7 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
             jComboCategory.addItem("");
             jComboMaximum.addItem("");
             jComboSecurity.addItem("");
-            
+
             //additional Items Information
             jComboBoxButtonText.addItem("");
             jComboBoxRemotePrint.addItem("");
@@ -253,6 +249,9 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
             jComboBoxProp.addItem("");
             jComboBoxAux.addItem("");
             jComboBoxShortName.addItem("");
+            jComboBoxIspack.addItem("");
+            jComboBoxPackSize.addItem("");
+            jComboBoxPackOf.addItem("");
 
             /**
              * @todo Return header list for processing elsewhere
@@ -267,7 +266,7 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
                 jComboSecurity.addItem(products.getHeader(i));
                 jComboMaximum.addItem(products.getHeader(i));
                 Headers.add(products.getHeader(i));
-                
+
                 //additional Items Information
                 jComboBoxButtonText.addItem(products.getHeader(i));
                 jComboBoxRemotePrint.addItem(products.getHeader(i));
@@ -278,6 +277,9 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
                 jComboBoxProp.addItem(products.getHeader(i));
                 jComboBoxAux.addItem(products.getHeader(i));
                 jComboBoxShortName.addItem(products.getHeader(i));
+                jComboBoxIspack.addItem(products.getHeader(i));
+                jComboBoxPackSize.addItem(products.getHeader(i));
+                jComboBoxPackOf.addItem(products.getHeader(i));
 
                 ++i;
             }
@@ -334,6 +336,9 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         jComboBoxProp.setEnabled(true);
         jComboBoxAux.setEnabled(true);
         jComboBoxShortName.setEnabled(true);
+        jComboBoxIspack.setEnabled(true);
+        jComboBoxPackSize.setEnabled(true);
+        jComboBoxPackOf.setEnabled(true);
     }
 
     /**
@@ -353,12 +358,12 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
             products.setDelimiter(((String) jComboSeparator.getSelectedItem()).charAt(0));
             products.readHeaders();
 
-                try {
-                    stockLocation = (String) ((Object[]) jParamsLocation.createValue())[1];
-                } catch (BasicException ex) {
-                    jCheckAddStockLevels.setSelected(false);
-                }
-            
+            try {
+                stockLocation = (String) ((Object[]) jParamsLocation.createValue())[1];
+            } catch (BasicException ex) {
+                jCheckAddStockLevels.setSelected(false);
+            }
+
             currentRecord = 0;
             while (products.readRecord()) {
                 productReference = products.get((String) jComboReference.getSelectedItem());
@@ -379,7 +384,10 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
                 prop = products.get((String) jComboBoxProp.getSelectedItem());
                 aux = products.get((String) jComboBoxAux.getSelectedItem());
                 shortName = products.get((String) jComboBoxShortName.getSelectedItem());
-                
+                isPack = products.get((String) jComboBoxIspack.getSelectedItem());
+                String boxPackSize = products.get((String) jComboBoxPackSize.getSelectedItem());
+                packOf = products.get((String) jComboBoxPackOf.getSelectedItem());
+
                 currentRecord++;
 
                 // Strip Currency Symbols
@@ -433,8 +441,8 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
                         && "".equals(productName)
                         && "".equals(productBarcode)
                         && "".equals(BuyPrice)
-                        && "".equals(SellPrice) ) {
-                        // Ignore blank lines in the import file
+                        && "".equals(SellPrice)) {
+                    // Ignore blank lines in the import file
                 } else if ("".equals(productReference)
                         | "".equals(productName)
                         | "".equals(productBarcode)
@@ -533,7 +541,8 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
      * <code>double</code>
      *
      * @param pSellPrice sell price to be converted
-     * @return sell price after adjustment for included taxes and converted to <code>double</double>
+     * @return sell price after adjustment for included taxes and converted to
+     * <code>double</double>
      */
     private Double getSellPrice(String pSellPrice) {
         // Check if the selling price icludes taxes 
@@ -558,7 +567,7 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         try {
             prodInfo = m_dlSales.getProductInfo(pID);
             dOriginalRate = taxeslogic.getTaxRate(prodInfo.getTaxCategoryID());
-            dCategory = ((String) cat_list.get(prodInfo.getCategoryID())== null )? prodInfo.getCategoryID():(String) cat_list.get(prodInfo.getCategoryID());
+            dCategory = ((String) cat_list.get(prodInfo.getCategoryID()) == null) ? prodInfo.getCategoryID() : (String) cat_list.get(prodInfo.getCategoryID());
             oldBuyPrice = prodInfo.getPriceBuy();
             oldSellPrice = prodInfo.getPriceSell();
             productSellPrice *= (1 + dOriginalRate);
@@ -566,7 +575,7 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
                 createCSVEntry("Updated Price Details", oldBuyPrice, oldSellPrice * (1 + dOriginalRate));
                 createProduct("update");
                 priceUpdates++;
-           } else {
+            } else {
                 noChanges++;
             }
         } catch (BasicException ex) {
@@ -607,7 +616,7 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         taxcatsent = m_dlSales.getTaxCategoriesList();
         taxcatmodel = new ComboBoxValModel(taxcatsent.list());
         jComboTax.setModel(taxcatmodel);
-        
+
         // Get categories list
         m_sentcat = m_dlSales.getCategoriesList();
         m_CategoryModel = new ComboBoxValModel(m_sentcat.list());
@@ -632,7 +641,7 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         jComboSeparator.addItem("~");
         jComboSeparator.addItem("^");
         jComboSeparator.addItem("|");
-        
+
         jParamsLocation.init(m_App);
         jParamsLocation.activate();
     }
@@ -661,7 +670,7 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         jComboMaximum.removeAllItems();
         jComboMaximum.setEnabled(false);
         jComboTax.setEnabled(false);
-        
+
         //additional Information
         jComboBoxButtonText.setEnabled(false);
         jComboBoxButtonText.removeAllItems();
@@ -681,6 +690,12 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         jComboBoxAux.removeAllItems();
         jComboBoxShortName.setEnabled(false);
         jComboBoxShortName.removeAllItems();
+        jComboBoxIspack.setEnabled(false);
+        jComboBoxIspack.removeAllItems();
+        jComboBoxPackSize.setEnabled(false);
+        jComboBoxPackSize.removeAllItems();
+        jComboBoxPackOf.setEnabled(false);
+        jComboBoxPackOf.removeAllItems();
 
         jImport.setEnabled(false);
         jHeaderRead.setEnabled(false);
@@ -715,21 +730,22 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
      */
     public void checkFieldMapping() {
         boolean bStockOK = !jCheckAddStockLevels.isSelected();
-        
-        if( !bStockOK ) {
-            if( jComboSecurity.getSelectedItem() != "" && jComboMaximum.getSelectedItem() != "" )
+
+        if (!bStockOK) {
+            if (jComboSecurity.getSelectedItem() != "" && jComboMaximum.getSelectedItem() != "") {
                 bStockOK = true;
+            }
         }
-        
-        if ( bStockOK && jComboReference.getSelectedItem() != "" && jComboName.getSelectedItem() != "" && jComboBarcode.getSelectedItem() != ""
+
+        if (bStockOK && jComboReference.getSelectedItem() != "" && jComboName.getSelectedItem() != "" && jComboBarcode.getSelectedItem() != ""
                 && jComboBuy.getSelectedItem() != "" && jComboSell.getSelectedItem() != "" && jComboCategory.getSelectedItem() != ""
                 && m_CategoryModel.getSelectedText() != null) {
             jImport.setEnabled(true);
         } else {
             jImport.setEnabled(false);
         }
+        System.out.println("here = " + bStockOK );
     }
-
     /**
      * Deactivates and resets all form fields.
      *
@@ -741,77 +757,71 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         return (true);
     }
 
-    public void createLocationStock( String ProductID, String LocationID, Double security, Double maximum ) throws BasicException {
+    public void createLocationStock(String ProductID, String LocationID, Double security, Double maximum) throws BasicException {
 
         // This should only be called on new products - we dont support updates to stock levels
         Object[] values = new Object[5];
         values[0] = UUID.randomUUID().toString();                               // ID string
         values[1] = LocationID;                                           // Reference string
         values[2] = ProductID;                                             // Barcode String        
-        values[3] = (double)security;                                                // Name string        
-        values[4] = (double)maximum;                                     // IScomment flag (Attribute modifier)
-      
-        PreparedSentence sentence = new PreparedSentence(m_App.getSession()
-                    , "INSERT INTO STOCKLEVEL (ID, LOCATION, PRODUCT, STOCKSECURITY, STOCKMAXIMUM) VALUES (?, ?, ?, ?, ?)"
-                    , new SerializerWriteBasicExt( (new Datas[] {Datas.STRING, Datas.STRING, Datas.STRING, Datas.DOUBLE, Datas.DOUBLE}),
-                            new int[] {0, 1, 2, 3, 4}));
-        
-        sentence.exec(values);  
+        values[3] = (double) security;                                                // Name string        
+        values[4] = (double) maximum;                                     // IScomment flag (Attribute modifier)
+
+        PreparedSentence sentence = new PreparedSentence(m_App.getSession(), "INSERT INTO STOCKLEVEL (ID, LOCATION, PRODUCT, STOCKSECURITY, STOCKMAXIMUM) VALUES (?, ?, ?, ?, ?)", new SerializerWriteBasicExt((new Datas[]{Datas.STRING, Datas.STRING, Datas.STRING, Datas.DOUBLE, Datas.DOUBLE}),
+                new int[]{0, 1, 2, 3, 4}));
+
+        sentence.exec(values);
 
     }
 
-    public void updateLocationStock( String ProductID, String LocationID, Double security, Double maximum ) throws BasicException {
+    public void updateLocationStock(String ProductID, String LocationID, Double security, Double maximum) throws BasicException {
 
         // This should only be called on new products - we dont support updates to stock levels
         Object[] values = new Object[4];
-        values[0] = (double)security;                                                // Name string        
-        values[1] = (double)maximum;                                     // IScomment flag (Attribute modifier)
+        values[0] = (double) security;                                                // Name string        
+        values[1] = (double) maximum;                                     // IScomment flag (Attribute modifier)
         values[2] = ProductID;                                             // Barcode String        
         values[3] = LocationID;                                           // Reference string
-      
-        PreparedSentence sentence = new PreparedSentence(m_App.getSession()
-                    , "UPDATE STOCKLEVEL SET STOCKSECURITY = ?, STOCKMAXIMUM = ? WHERE PRODUCT = ? AND LOCATION = ?"
-                    , new SerializerWriteBasicExt( (new Datas[] {Datas.DOUBLE, Datas.DOUBLE, Datas.STRING, Datas.STRING }),
-                            new int[] {0, 1, 2, 3}));
-        
-        sentence.exec(values);  
+
+        PreparedSentence sentence = new PreparedSentence(m_App.getSession(), "UPDATE STOCKLEVEL SET STOCKSECURITY = ?, STOCKMAXIMUM = ? WHERE PRODUCT = ? AND LOCATION = ?", new SerializerWriteBasicExt((new Datas[]{Datas.DOUBLE, Datas.DOUBLE, Datas.STRING, Datas.STRING}),
+                new int[]{0, 1, 2, 3}));
+
+        sentence.exec(values);
 
     }
-    
-     /**
+
+    /**
      *
      * @return
      */
-    public Boolean isExistingLocationStock( String ProductID, String LocationID ) throws BasicException {
+    public Boolean isExistingLocationStock(String ProductID, String LocationID) throws BasicException {
         Boolean bExists = false;
-        
+
         // This should only be called on new products - we dont support updates to stock levels
         Object[] values = new Object[2];
         values[0] = ProductID;                                             // Barcode String        
         values[1] = LocationID;                                           // Reference string
-      
-        PreparedSentence sentence = new PreparedSentence(m_App.getSession()
-                    , "SELECT * FROM STOCKLEVEL WHERE PRODUCT = ? AND LOCATION = ?"
-                    , new SerializerWriteBasicExt( (new Datas[] { Datas.STRING, Datas.STRING }),
-                            new int[] {0, 1}));
-         
+
+        PreparedSentence sentence = new PreparedSentence(m_App.getSession(), "SELECT * FROM STOCKLEVEL WHERE PRODUCT = ? AND LOCATION = ?", new SerializerWriteBasicExt((new Datas[]{Datas.STRING, Datas.STRING}),
+                new int[]{0, 1}));
+
         DataResultSet results = sentence.openExec(values);
-        
-        if( results.next()) 
+
+        if (results.next()) {
             bExists = true;
-        
+        }
+
         return bExists;
     }
-    
-     public void UpdateOrCreateLocationStock( String ProductID, String LocationID, Double security, Double maximum ) throws BasicException {
-        
-         if( isExistingLocationStock( ProductID, LocationID )) {
-             updateLocationStock( ProductID,  LocationID,  security,  maximum );
-         } else {
-             createLocationStock(  ProductID,  LocationID,  security,  maximum );
-         }
-     }
-     
+
+    public void UpdateOrCreateLocationStock(String ProductID, String LocationID, Double security, Double maximum) throws BasicException {
+
+        if (isExistingLocationStock(ProductID, LocationID)) {
+            updateLocationStock(ProductID, LocationID, security, maximum);
+        } else {
+            createLocationStock(ProductID, LocationID, security, maximum);
+        }
+    }
 
     /**
      *
@@ -821,21 +831,22 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
 // create a new product and save it using DalaLogicSales
         Object propBlob;
         try {
-            if(prop.isEmpty())
-                propBlob=null;
-            else
+            if (prop.isEmpty()) {
+                propBlob = null;
+            } else {
                 propBlob = Formats.BYTEA.parseValue(prop);
+            }
         } catch (BasicException e) {
             propBlob = null;
         }
-        
+
         Object[] myprod = new Object[33];
         myprod[0] = UUID.randomUUID().toString();                               // ID string
         myprod[1] = productReference;                                           // Reference string
         myprod[2] = productBarcode;                                             // Barcode String
         myprod[3] = BarcodeValidator.BarcodeValidate(productBarcode);           // Barcode Type
         myprod[4] = productName;                                                // Name string        
-        myprod[5] = ((aux!=null) && !aux.isEmpty()&&(aux.equals("1")||aux.equalsIgnoreCase("yes")));  // IScondiment flag (Auxiliary modifier)
+        myprod[5] = ((aux != null) && !aux.isEmpty() && (aux.equals("1") || aux.equalsIgnoreCase("yes")));  // IScondiment flag (Auxiliary modifier)
         myprod[6] = false;                                     // ISscale flag
         myprod[7] = productBuyPrice;                                            // Buy price double
         myprod[8] = productSellPrice;                                           // Sell price double
@@ -847,39 +858,39 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         myprod[14] = (double) 0;                                                // Stock volume double
         myprod[15] = jCheckInCatalogue.isSelected();                            // In catalog flag
         myprod[16] = null;                                                      // catalog order        
-        myprod[17] = ((propBlob==null)?null:propBlob);        // Attributes (Product Properites)
-        myprod[18] = ((remotePrint!=null) && !remotePrint.isEmpty()&&(remotePrint.equals("1")||remotePrint.equalsIgnoreCase("yes"))); // IsKitchen flag
-        myprod[19] = ((service!=null) && !service.isEmpty()&&(service.equals("1")||service.equalsIgnoreCase("yes"))); // isService flag
-        myprod[20] = ((buttonText!=null) && !buttonText.isEmpty())?buttonText:"<HTML>" + productName; // Button Text     
-        myprod[21] = ((varPrice!=null) && !varPrice.isEmpty()&&(varPrice.equals("1")||varPrice.equalsIgnoreCase("yes"))); // isVariable price flag
+        myprod[17] = ((propBlob == null) ? null : propBlob);        // Attributes (Product Properites)
+        myprod[18] = ((remotePrint != null) && !remotePrint.isEmpty() && (remotePrint.equals("1") || remotePrint.equalsIgnoreCase("yes"))); // IsKitchen flag
+        myprod[19] = ((service != null) && !service.isEmpty() && (service.equals("1") || service.equalsIgnoreCase("yes"))); // isService flag
+        myprod[20] = ((buttonText != null) && !buttonText.isEmpty()) ? buttonText : "<HTML>" + productName; // Button Text     
+        myprod[21] = ((varPrice != null) && !varPrice.isEmpty() && (varPrice.equals("1") || varPrice.equalsIgnoreCase("yes"))); // isVariable price flag
         myprod[22] = false;                                                     // Compulsory Att flag
-        myprod[23] = ((textTip.isEmpty())?productName:textTip);                                               // Text tip string
-        myprod[24] = ((warranty!=null) && !warranty.isEmpty()&&(warranty.equals("1")||warranty.equalsIgnoreCase("yes"))); // Warranty flag
+        myprod[23] = ((textTip.isEmpty()) ? productName : textTip);                                               // Text tip string
+        myprod[24] = ((warranty != null) && !warranty.isEmpty() && (warranty.equals("1") || warranty.equalsIgnoreCase("yes"))); // Warranty flag
         myprod[25] = 0.0;
         myprod[26] = shortName;                                                 // Alias
         myprod[27] = false;                                                     // AlwaysAvailable flag
         myprod[28] = "no";
-        myprod[29] = false;                                                     
-        myprod[30] = false;                                                     // Is a pack
-        myprod[31] = (double)0;                                                 // PackQuantity
-        myprod[32] = null;                                                     // Pack Product
-          
+        myprod[29] = false;
+        myprod[30] = ((isPack != null) && !isPack.isEmpty() && (isPack.equals("1") || isPack.equalsIgnoreCase("yes"))); // Is a pack
+        myprod[31] = packSize;                                                 // PackQuantity
+        myprod[32] = packOf;                                                     // Pack Product
+
         try {
             if ("new".equals(pType)) {
                 spr.insertData(myprod);
-                
-                if( jCheckAddStockLevels.isSelected() ) {
-                    createLocationStock( myprod[0].toString(), stockLocation, stockSecurity, stockMaximum );
+
+                if (jCheckAddStockLevels.isSelected()) {
+                    createLocationStock(myprod[0].toString(), stockLocation, stockSecurity, stockMaximum);
                 }
             } else {
-                myprod[0]=prodInfo.getID();
+                myprod[0] = prodInfo.getID();
                 spr.updateData(myprod);
-                
-                if( jCheckAddStockLevels.isSelected() ) {
-                    UpdateOrCreateLocationStock( myprod[0].toString(), stockLocation, stockSecurity, stockMaximum );
-                }            
+
+                if (jCheckAddStockLevels.isSelected()) {
+                    UpdateOrCreateLocationStock(myprod[0].toString(), stockLocation, stockSecurity, stockMaximum);
+                }
             }
-                
+
         } catch (BasicException ex) {
             Logger.getLogger(JPanelCSVImport.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -906,7 +917,6 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         myprod[9] = previousSell;                                               // Previous Sell price double
         myprod[10] = Category;
 
-        
         try {
             m_dlSystem.execAddCSVEntry(myprod);
         } catch (BasicException ex) {
@@ -933,34 +943,37 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
     }
 
     /**
-     * 
-     * Returns true if any entry in the combo boxes is un use
+     *
+     * Returns true if any entry in the combo boxes is in use
+     *
      * @param entry
-     * @return 
+     * @return
      */
     public boolean isEntryInUse(String entry) {
-        
-        return ((entry == jComboCategory.getSelectedItem()) |
-                (entry == jComboReference.getSelectedItem()) |
-                (entry == jComboName.getSelectedItem()) |
-                (entry == jComboBuy.getSelectedItem()) |
-                (entry == jComboSell.getSelectedItem()) |
-                (entry == jComboMaximum.getSelectedItem()) |
-                (entry == jComboSecurity.getSelectedItem()) |
-                (entry == jComboBarcode.getSelectedItem()) |
-                (entry == jComboBoxButtonText.getSelectedItem()) |
-                (entry == jComboBoxRemotePrint.getSelectedItem()) |
-                (entry == jComboBoxService.getSelectedItem()) |
-                (entry == jComboBoxVarPrice.getSelectedItem()) |
-                (entry == jComboBoxWarranty.getSelectedItem()) |
-                (entry == jComboBoxTextTip.getSelectedItem()) |
-                (entry == jComboBoxProp.getSelectedItem()) |
-                (entry == jComboBoxAux.getSelectedItem()) |
-                (entry == jComboBoxShortName.getSelectedItem())
-            );
+
+        return ((entry == jComboCategory.getSelectedItem())
+                | (entry == jComboReference.getSelectedItem())
+                | (entry == jComboName.getSelectedItem())
+                | (entry == jComboBuy.getSelectedItem())
+                | (entry == jComboSell.getSelectedItem())
+                | (entry == jComboMaximum.getSelectedItem())
+                | (entry == jComboSecurity.getSelectedItem())
+                | (entry == jComboBarcode.getSelectedItem())
+                | (entry == jComboBoxButtonText.getSelectedItem())
+                | (entry == jComboBoxRemotePrint.getSelectedItem())
+                | (entry == jComboBoxService.getSelectedItem())
+                | (entry == jComboBoxVarPrice.getSelectedItem())
+                | (entry == jComboBoxWarranty.getSelectedItem())
+                | (entry == jComboBoxTextTip.getSelectedItem())
+                | (entry == jComboBoxProp.getSelectedItem())
+                | (entry == jComboBoxAux.getSelectedItem())
+                | (entry == jComboBoxShortName.getSelectedItem())
+                | (entry == jComboBoxIspack.getSelectedItem())
+                | (entry == jComboBoxPackSize.getSelectedItem())
+                | (entry == jComboBoxPackOf.getSelectedItem()));
 
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -1020,6 +1033,10 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         jComboBoxProp = new javax.swing.JComboBox();
         jLabelVarPrice = new javax.swing.JLabel();
         jComboBoxVarPrice = new javax.swing.JComboBox();
+        jComboBoxIspack = new javax.swing.JComboBox();
+        jLabelProp1 = new javax.swing.JLabel();
+        jComboBoxPackOf = new javax.swing.JComboBox();
+        jLabelProp2 = new javax.swing.JLabel();
         jCustom3 = new javax.swing.JPanel();
         jCustom2 = new javax.swing.JPanel();
         jLabelService = new javax.swing.JLabel();
@@ -1030,6 +1047,8 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         jComboBoxRemotePrint = new javax.swing.JComboBox();
         jLabelTextTip = new javax.swing.JLabel();
         jComboBoxTextTip = new javax.swing.JComboBox();
+        jComboBoxPackSize = new javax.swing.JComboBox();
+        jLabelTextTip1 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         jLabel14 = new javax.swing.JLabel();
@@ -1058,7 +1077,6 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         jComboSeparator.setPreferredSize(new java.awt.Dimension(50, 30));
 
         jLabel17.setFont(new java.awt.Font("Tahoma", 0, 10)); // NOI18N
-        jLabel17.setText("Import Version V2.2(TJMChan)");
 
         jLabel18.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         java.util.ResourceBundle bundle = java.util.ResourceBundle.getBundle("pos_messages"); // NOI18N
@@ -1145,8 +1163,8 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         jHeaderLayout.setVerticalGroup(
             jHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jHeaderLayout.createSequentialGroup()
-                .addComponent(jLabel17)
-                .addGap(0, 89, Short.MAX_VALUE))
+                .addComponent(jLabel17, javax.swing.GroupLayout.PREFERRED_SIZE, 0, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 113, Short.MAX_VALUE))
             .addGroup(jHeaderLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jHeaderLayout.createSequentialGroup()
                     .addGap(23, 23, 23)
@@ -1166,11 +1184,6 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         jComboReference.setEnabled(false);
         jComboReference.setMinimumSize(new java.awt.Dimension(32, 25));
         jComboReference.setPreferredSize(new java.awt.Dimension(100, 30));
-        jComboReference.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                jComboItemStateChanged(evt);
-            }
-        });
         jComboReference.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 jComboBoxFocusGained(evt);
@@ -1352,7 +1365,7 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jComboSell, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 50, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 62, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jComboSecurity, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel22, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -1378,6 +1391,11 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         jCheckSellIncTax.setEnabled(false);
 
         jCheckAddStockLevels.setEnabled(false);
+        jCheckAddStockLevels.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                jComboItemStateChanged(evt);
+            }
+        });
 
         jLabel24.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel24.setText("Include Stock Levels");
@@ -1477,7 +1495,7 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jComboTax, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 134, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 141, Short.MAX_VALUE)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jCheckAddStockLevels)
                     .addComponent(jLabel24, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -1500,103 +1518,106 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
 
         jCustom.setLayout(new javax.swing.BoxLayout(jCustom, javax.swing.BoxLayout.LINE_AXIS));
 
+        jCustom1.setMaximumSize(new java.awt.Dimension(320, 348));
+        jCustom1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
         jLabelButtonText.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabelButtonText.setText("Button Text");
+        jCustom1.add(jLabelButtonText, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 73, -1, -1));
 
         jComboBoxButtonText.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jComboBoxButtonText.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jComboBoxButtonText.setSelectedIndex(-1);
         jComboBoxButtonText.setEnabled(false);
+        jComboBoxButtonText.setLightWeightPopupEnabled(false);
+        jComboBoxButtonText.setMaximumSize(new java.awt.Dimension(66, 23));
         jComboBoxButtonText.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 jComboBoxFocusGained(evt);
             }
         });
+        jCustom1.add(jComboBoxButtonText, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 69, 200, -1));
 
         jLabelWarranty.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabelWarranty.setText("Warranty");
+        jCustom1.add(jLabelWarranty, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 15, 61, -1));
 
         jComboBoxWarranty.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jComboBoxWarranty.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jComboBoxWarranty.setSelectedIndex(-1);
         jComboBoxWarranty.setEnabled(false);
+        jComboBoxWarranty.setMaximumSize(new java.awt.Dimension(200, 23));
+        jComboBoxWarranty.setPreferredSize(new java.awt.Dimension(200, 23));
         jComboBoxWarranty.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 jComboBoxFocusGained(evt);
             }
         });
+        jCustom1.add(jComboBoxWarranty, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 11, -1, -1));
 
         jLabelProp.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabelProp.setText(bundle.getString("label.prodproperties")); // NOI18N
+        jCustom1.add(jLabelProp, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 102, 90, -1));
 
         jComboBoxProp.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jComboBoxProp.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jComboBoxProp.setSelectedIndex(-1);
         jComboBoxProp.setEnabled(false);
+        jComboBoxProp.setMaximumSize(new java.awt.Dimension(66, 23));
         jComboBoxProp.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 jComboBoxFocusGained(evt);
             }
         });
-        jComboBoxProp.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jComboBoxPropActionPerformed(evt);
-            }
-        });
+        jCustom1.add(jComboBoxProp, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 98, 200, -1));
 
         jLabelVarPrice.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabelVarPrice.setText("Var Price");
+        jCustom1.add(jLabelVarPrice, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 44, -1, -1));
 
         jComboBoxVarPrice.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jComboBoxVarPrice.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jComboBoxVarPrice.setSelectedIndex(-1);
         jComboBoxVarPrice.setEnabled(false);
+        jComboBoxVarPrice.setMaximumSize(new java.awt.Dimension(66, 23));
         jComboBoxVarPrice.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 jComboBoxFocusGained(evt);
             }
         });
+        jCustom1.add(jComboBoxVarPrice, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 40, 200, -1));
 
-        javax.swing.GroupLayout jCustom1Layout = new javax.swing.GroupLayout(jCustom1);
-        jCustom1.setLayout(jCustom1Layout);
-        jCustom1Layout.setHorizontalGroup(
-            jCustom1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jCustom1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jCustom1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabelWarranty, javax.swing.GroupLayout.PREFERRED_SIZE, 61, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabelVarPrice)
-                    .addComponent(jLabelButtonText)
-                    .addComponent(jLabelProp))
-                .addGap(39, 39, 39)
-                .addGroup(jCustom1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jComboBoxButtonText, 0, 200, Short.MAX_VALUE)
-                    .addComponent(jComboBoxWarranty, 0, 200, Short.MAX_VALUE)
-                    .addComponent(jComboBoxVarPrice, 0, 200, Short.MAX_VALUE)
-                    .addComponent(jComboBoxProp, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jCustom1Layout.setVerticalGroup(
-            jCustom1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jCustom1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jCustom1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabelWarranty)
-                    .addComponent(jComboBoxWarranty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jCustom1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabelVarPrice)
-                    .addComponent(jComboBoxVarPrice, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jCustom1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabelButtonText)
-                    .addComponent(jComboBoxButtonText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jCustom1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabelProp)
-                    .addComponent(jComboBoxProp, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(211, Short.MAX_VALUE))
-        );
+        jComboBoxIspack.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jComboBoxIspack.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBoxIspack.setSelectedIndex(-1);
+        jComboBoxIspack.setEnabled(false);
+        jComboBoxIspack.setMaximumSize(new java.awt.Dimension(66, 23));
+        jComboBoxIspack.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jComboBoxFocusGained(evt);
+            }
+        });
+        jCustom1.add(jComboBoxIspack, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 127, 200, -1));
+
+        jLabelProp1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabelProp1.setText(bundle.getString("label.ispack")); // NOI18N
+        jCustom1.add(jLabelProp1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 127, 90, 23));
+
+        jComboBoxPackOf.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jComboBoxPackOf.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBoxPackOf.setSelectedIndex(-1);
+        jComboBoxPackOf.setEnabled(false);
+        jComboBoxPackOf.setMaximumSize(new java.awt.Dimension(66, 23));
+        jComboBoxPackOf.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jComboBoxFocusGained(evt);
+            }
+        });
+        jCustom1.add(jComboBoxPackOf, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 156, 200, -1));
+
+        jLabelProp2.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabelProp2.setText(bundle.getString("label.productinpack")); // NOI18N
+        jCustom1.add(jLabelProp2, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 160, 90, -1));
 
         jCustom.add(jCustom1);
 
@@ -1604,111 +1625,97 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         jCustom3.setLayout(jCustom3Layout);
         jCustom3Layout.setHorizontalGroup(
             jCustom3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 19, Short.MAX_VALUE)
+            .addGap(0, 40, Short.MAX_VALUE)
         );
         jCustom3Layout.setVerticalGroup(
             jCustom3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 343, Short.MAX_VALUE)
+            .addGap(0, 355, Short.MAX_VALUE)
         );
 
         jCustom.add(jCustom3);
 
+        jCustom2.setMaximumSize(new java.awt.Dimension(320, 348));
+        jCustom2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
         jLabelService.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabelService.setText("Service Item");
+        jCustom2.add(jLabelService, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 15, -1, -1));
 
         jComboBoxService.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jComboBoxService.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jComboBoxService.setSelectedIndex(-1);
         jComboBoxService.setEnabled(false);
+        jComboBoxService.setMaximumSize(new java.awt.Dimension(66, 23));
         jComboBoxService.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 jComboBoxFocusGained(evt);
             }
         });
+        jCustom2.add(jComboBoxService, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 11, 200, -1));
 
         jLabelAux.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabelAux.setText("Aux Product");
+        jCustom2.add(jLabelAux, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 44, -1, -1));
 
         jComboBoxAux.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jComboBoxAux.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jComboBoxAux.setSelectedIndex(-1);
         jComboBoxAux.setEnabled(false);
+        jComboBoxAux.setMaximumSize(new java.awt.Dimension(66, 23));
         jComboBoxAux.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 jComboBoxFocusGained(evt);
             }
         });
+        jCustom2.add(jComboBoxAux, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 40, 200, -1));
 
         jLabelRemotePrint.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabelRemotePrint.setText("Remote Print");
+        jCustom2.add(jLabelRemotePrint, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 73, -1, -1));
 
         jComboBoxRemotePrint.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jComboBoxRemotePrint.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jComboBoxRemotePrint.setSelectedIndex(-1);
         jComboBoxRemotePrint.setEnabled(false);
+        jComboBoxRemotePrint.setMaximumSize(new java.awt.Dimension(66, 23));
         jComboBoxRemotePrint.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 jComboBoxFocusGained(evt);
             }
         });
+        jCustom2.add(jComboBoxRemotePrint, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 69, 200, -1));
 
         jLabelTextTip.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabelTextTip.setText(bundle.getString("label.texttip")); // NOI18N
+        jCustom2.add(jLabelTextTip, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 102, -1, -1));
 
         jComboBoxTextTip.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jComboBoxTextTip.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jComboBoxTextTip.setSelectedIndex(-1);
         jComboBoxTextTip.setEnabled(false);
+        jComboBoxTextTip.setMaximumSize(new java.awt.Dimension(66, 23));
         jComboBoxTextTip.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 jComboBoxFocusGained(evt);
             }
         });
+        jCustom2.add(jComboBoxTextTip, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 98, 200, -1));
 
-        javax.swing.GroupLayout jCustom2Layout = new javax.swing.GroupLayout(jCustom2);
-        jCustom2.setLayout(jCustom2Layout);
-        jCustom2Layout.setHorizontalGroup(
-            jCustom2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jCustom2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jCustom2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jCustom2Layout.createSequentialGroup()
-                        .addGroup(jCustom2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabelService)
-                            .addComponent(jLabelRemotePrint)
-                            .addComponent(jLabelAux))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jCustom2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jComboBoxRemotePrint, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jComboBoxService, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jComboBoxAux, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jCustom2Layout.createSequentialGroup()
-                        .addComponent(jLabelTextTip)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jComboBoxTextTip, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
-        );
-        jCustom2Layout.setVerticalGroup(
-            jCustom2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jCustom2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jCustom2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabelService)
-                    .addComponent(jComboBoxService, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jCustom2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabelAux)
-                    .addComponent(jComboBoxAux, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jCustom2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabelRemotePrint)
-                    .addComponent(jComboBoxRemotePrint, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jCustom2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jComboBoxTextTip, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabelTextTip))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
+        jComboBoxPackSize.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jComboBoxPackSize.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        jComboBoxPackSize.setSelectedIndex(-1);
+        jComboBoxPackSize.setEnabled(false);
+        jComboBoxPackSize.setMaximumSize(new java.awt.Dimension(66, 23));
+        jComboBoxPackSize.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jComboBoxFocusGained(evt);
+            }
+        });
+        jCustom2.add(jComboBoxPackSize, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 127, 200, -1));
+
+        jLabelTextTip1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        jLabelTextTip1.setText(bundle.getString("label.packsof")); // NOI18N
+        jCustom2.add(jLabelTextTip1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 127, 96, 23));
 
         jCustom.add(jCustom2);
 
@@ -1936,7 +1943,7 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
                         .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 666, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addContainerGap(99, Short.MAX_VALUE))))
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jFooter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
@@ -1949,7 +1956,7 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 90, Short.MAX_VALUE)
                 .addComponent(jFooter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -2038,7 +2045,7 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
     }//GEN-LAST:event_jComboCategoryItemStateChanged
 
     private void jComboBoxFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jComboBoxFocusGained
-        JComboBox myJComboBox = ((javax.swing.JComboBox)(evt.getComponent()));
+        JComboBox myJComboBox = ((javax.swing.JComboBox) (evt.getComponent()));
         myJComboBox.removeAllItems();
         int i = 1;
         myJComboBox.addItem("");
@@ -2054,10 +2061,6 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         checkFieldMapping();
     }//GEN-LAST:event_jComboItemStateChanged
 
-    private void jComboBoxPropActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxPropActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jComboBoxPropActionPerformed
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox jCheckAddStockLevels;
     private javax.swing.JCheckBox jCheckInCatalogue;
@@ -2065,6 +2068,9 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
     private javax.swing.JComboBox jComboBarcode;
     private javax.swing.JComboBox jComboBoxAux;
     private javax.swing.JComboBox jComboBoxButtonText;
+    private javax.swing.JComboBox jComboBoxIspack;
+    private javax.swing.JComboBox jComboBoxPackOf;
+    private javax.swing.JComboBox jComboBoxPackSize;
     private javax.swing.JComboBox jComboBoxProp;
     private javax.swing.JComboBox jComboBoxRemotePrint;
     private javax.swing.JComboBox jComboBoxService;
@@ -2118,10 +2124,13 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
     private javax.swing.JLabel jLabelAux;
     private javax.swing.JLabel jLabelButtonText;
     private javax.swing.JLabel jLabelProp;
+    private javax.swing.JLabel jLabelProp1;
+    private javax.swing.JLabel jLabelProp2;
     private javax.swing.JLabel jLabelRemotePrint;
     private javax.swing.JLabel jLabelService;
     private javax.swing.JLabel jLabelShortName;
     private javax.swing.JLabel jLabelTextTip;
+    private javax.swing.JLabel jLabelTextTip1;
     private javax.swing.JLabel jLabelVarPrice;
     private javax.swing.JLabel jLabelWarranty;
     private javax.swing.JPanel jPanel1;
