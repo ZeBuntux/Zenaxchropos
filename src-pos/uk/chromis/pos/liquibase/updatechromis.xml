@@ -93,7 +93,7 @@
          
     <changeSet author="Chromis POS" id="update to to new menu for roles">    
         <update tableName="RESOURCES">
-            <column name="CONTENT" valueBlobResource="/uk/chromis/pos/templates/Menu.Root.txt"/>  
+            <column name="CONTENT" valueBlobFile="/uk/chromis/pos/templates/Menu.Root.txt"/>  
             <where>NAME='Menu.Root'</where>      
         </update>               
     </changeSet>                          
@@ -639,7 +639,7 @@
             <column name="ID" value="63"/>
             <column name="NAME" value="Printer.TicketRefundPreview"/>
             <column name="RESTYPE" valueNumeric="0"/>
-            <column name="CONTENT" valueBlobResource="/uk/chromis/pos/templates/Printer.TicketRefundPreview.xml"/>
+            <column name="CONTENT" valueBlobFile="/uk/chromis/pos/templates/Printer.TicketRefundPreview.xml"/>
         </insert>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
     </changeSet>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
         
@@ -723,7 +723,7 @@
             <column name="ID" value="62"/>
             <column name="NAME" value="img.reportlogo"/>
             <column name="RESTYPE" valueNumeric="1"/>
-            <column name="CONTENT" valueBlobResource="/uk/chromis/pos/templates/img.reportlogo.png"/>
+            <column name="CONTENT" valueBlobFile="/uk/chromis/pos/templates/img.reportlogo.png"/>
         </insert>
     </changeSet>                    
   
@@ -796,7 +796,7 @@
             <column name="ID" value="64"/>
             <column name="NAME" value="sql.ActionStockChanges"/>
             <column name="RESTYPE" valueNumeric="0"/>
-            <column name="CONTENT" valueBlobResource="/uk/chromis/pos/templates/sql.ActionStockChanges.txt"/>
+            <column name="CONTENT" valueBlobFile="/uk/chromis/pos/templates/sql.ActionStockChanges.txt"/>
         </insert>
     </changeSet>    
          
