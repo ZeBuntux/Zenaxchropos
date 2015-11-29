@@ -47,6 +47,8 @@ import uk.chromis.pos.forms.DataLogicSales;
 import uk.chromis.pos.inventory.TaxCategoryInfo;
 import uk.chromis.pos.ticket.FindTicketsInfo;
 import uk.chromis.pos.ticket.FindTicketsRenderer;
+import uk.chromis.pos.ticket.TicketInfo;
+import uk.chromis.pos.ticket.TicketType;
 
 /**
  *
@@ -212,10 +214,10 @@ public class JTicketsFinder extends javax.swing.JDialog implements EditorCreator
             afilter[3] = 2;
         } else if (jComboBoxTicket.getSelectedIndex() == 0) {
             afilter[2] = QBFCompareEnum.COMP_EQUALS;
-            afilter[3] = 0;
+            afilter[3] = TicketType.NORMAL.getId();
         } else if (jComboBoxTicket.getSelectedIndex() == 1) {
             afilter[2] = QBFCompareEnum.COMP_EQUALS;
-            afilter[3] = 1;
+            afilter[3] = TicketType.REFUND.getId();
         }
         
         // Receipt money

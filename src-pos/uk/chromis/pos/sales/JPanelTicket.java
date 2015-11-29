@@ -96,6 +96,7 @@ import uk.chromis.pos.util.ReportUtils;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 import uk.chromis.pos.printer.DeviceDisplayAdvance;
+import uk.chromis.pos.ticket.TicketType;
 import uk.chromis.pos.util.AutoLogoff;
 
 /**
@@ -496,7 +497,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
             }
 
         } else {
-            if (m_oTicket.getTicketType() == TicketInfo.RECEIPT_REFUND) {
+            if (m_oTicket.getTicketType().equals(TicketType.REFUND)) {
                 //Make disable Search and Edit Buttons
                 m_jNumberKey.justEquals();
                 jEditAttributes.setVisible(false);
@@ -1143,7 +1144,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                     Toolkit.getDefaultToolkit().beep();
                 } else {
                     TicketLineInfo newline = new TicketLineInfo(m_oTicket.getLine(i));
-                    if (m_oTicket.getTicketType() == TicketInfo.RECEIPT_REFUND) {
+                    if (m_oTicket.getTicketType().equals(TicketType.REFUND)) {
                         newline.setMultiply(newline.getMultiply() - 1.0);
                         paintTicketLine(i, newline);
                     } else {
@@ -1160,7 +1161,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                 } else {
                     TicketLineInfo newline = new TicketLineInfo(m_oTicket.getLine(i));
                     //If it's a refund - button means one unit more
-                    if (m_oTicket.getTicketType() == TicketInfo.RECEIPT_REFUND) {
+                    if (m_oTicket.getTicketType().equals(TicketType.REFUND)) {
                         newline.setMultiply(newline.getMultiply() + 1.0);
                         if (newline.getMultiply() >= 0) {
                             removeTicketLine(i);
@@ -1185,7 +1186,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                 } else {
                     double dPor = getPorValue();
                     TicketLineInfo newline = new TicketLineInfo(m_oTicket.getLine(i));
-                    if (m_oTicket.getTicketType() == TicketInfo.RECEIPT_REFUND) {
+                    if (m_oTicket.getTicketType().equals(TicketType.REFUND)) {
                         newline.setMultiply(-dPor);
                         newline.setPrice(Math.abs(newline.getPrice()));
                         paintTicketLine(i, newline);
@@ -1204,7 +1205,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                 } else {
                     double dPor = getPorValue();
                     TicketLineInfo newline = new TicketLineInfo(m_oTicket.getLine(i));
-                    if (m_oTicket.getTicketType() == TicketInfo.RECEIPT_NORMAL) {
+                    if (m_oTicket.getTicketType().equals(TicketType.NORMAL) || m_oTicket.getTicketType().equals(TicketType.NORMAL)) {
                         newline.setMultiply(dPor);
                         newline.setPrice(-Math.abs(newline.getPrice()));
                         paintTicketLine(i, newline);
@@ -1239,7 +1240,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                 if (m_oTicket.getLinesCount() > 0) {
 
                     if (closeTicket(m_oTicket, m_oTicketExt)) {
-                        if (m_oTicket.getTicketType() == TicketInfo.RECEIPT_REFUND) {
+                        if (m_oTicket.getTicketType().equals(TicketType.REFUND)) {
                             try {
                                 JRefundLines.updateRefunds();
                             } catch (BasicException ex) {
@@ -1294,9 +1295,9 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                     printTicket("Printer.TicketTotal", ticket, ticketext);
 
                     // Select the Payments information
-                    JPaymentSelect paymentdialog = ticket.getTicketType() == TicketInfo.RECEIPT_NORMAL
-                            ? paymentdialogreceipt
-                            : paymentdialogrefund;
+                    JPaymentSelect paymentdialog = ticket.getTicketType().equals(TicketType.REFUND)
+                            ? paymentdialogrefund
+                            : paymentdialogreceipt ;
                     paymentdialog.setPrintSelected("true".equals(m_jbtnconfig.getProperty("printselected", "true")));
 
                     paymentdialog.setTransactionID(ticket.getTransactionID());
@@ -1315,10 +1316,13 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                         if (executeEvent(ticket, ticketext, "ticket.save") == null) {
                             // Save the receipt and assign a receipt number
                             try {
+                                if (!paymentdialog.isPrintSelected()) {
+                                    ticket.setTicketType(TicketType.INVOICE);
+                                }
                                 dlSales.saveTicket(ticket, m_App.getInventoryLocation());
                                 // code added to allow last ticket reprint       
                                 m_config.setProperty("lastticket.number", Integer.toString(ticket.getTicketId()));
-                                m_config.setProperty("lastticket.type", Integer.toString(ticket.getTicketType()));
+                                m_config.setProperty("lastticket.type", Integer.toString(ticket.getTicketType().getId()));
                                 m_config.save();
                             } catch (BasicException eData) {
                                 MessageInf msg = new MessageInf(MessageInf.SGN_NOTICE, AppLocal.getIntString("message.nosaveticket"), eData);
@@ -2352,7 +2356,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
     private void m_jDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_m_jDeleteActionPerformed
 
         int i = m_ticketlines.getSelectedIndex();
-        if (m_oTicket.getTicketType() == TicketInfo.RECEIPT_REFUND) {
+        if (m_oTicket.getTicketType().equals(TicketType.REFUND)) {
             JRefundLines.addBackLine(m_oTicket.getLine(i).printName(), m_oTicket.getLine(i).getMultiply(), m_oTicket.getLine(i).getPrice());
         }
         if (i < 0) {

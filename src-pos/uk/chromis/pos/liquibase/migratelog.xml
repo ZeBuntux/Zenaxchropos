@@ -1038,6 +1038,10 @@
     <changeSet author="Chromis Pos" id="Create TICKETSNUM Sequence" dbms="postgresql, hypersql, hsqldb">
         <sql>CREATE SEQUENCE TICKETSNUM START WITH 1</sql>
     </changeSet>
+    
+    <changeSet author="Chromis Pos" id="Create TICKETSNUM Sequence INVOICE" dbms="postgresql, hypersql, hsqldb">
+        <sql>CREATE SEQUENCE TICKETSNUM_INVOICE START WITH 1</sql>
+    </changeSet>
 
     <changeSet author="Chromis Pos" id="Create TICKETSNUM Sequence REFUND" dbms="postgresql, hypersql, hsqldb">
         <sql>CREATE SEQUENCE TICKETSNUM_REFUND START WITH 1</sql>

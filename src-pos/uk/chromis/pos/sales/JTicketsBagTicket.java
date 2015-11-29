@@ -44,6 +44,7 @@ import uk.chromis.pos.ticket.FindTicketsInfo;
 import uk.chromis.pos.ticket.TicketInfo;
 import uk.chromis.pos.ticket.TicketLineInfo;
 import uk.chromis.pos.ticket.TicketTaxInfo;
+import uk.chromis.pos.ticket.TicketType;
 
 public class JTicketsBagTicket extends JTicketsBag {
     
@@ -206,12 +207,14 @@ public class JTicketsBagTicket extends JTicketsBag {
         try {
             m_jEdit.setEnabled(
                     m_ticket != null
-                    && (m_ticket.getTicketType() == TicketInfo.RECEIPT_NORMAL || m_ticket.getTicketType() == TicketInfo.RECEIPT_REFUND)
+                    && (m_ticket.getTicketType().equals(TicketType.NORMAL) || m_ticket.getTicketType().equals(TicketType.INVOICE) 
+                            || m_ticket.getTicketType().equals(TicketType.REFUND))
                     && m_dlSales.isCashActive(m_ticket.getActiveCash()));
         } catch (BasicException e) {
             m_jEdit.setEnabled(false);
         }
-        m_jRefund.setEnabled(m_ticket != null && m_ticket.getTicketType() == TicketInfo.RECEIPT_NORMAL);
+        m_jRefund.setEnabled(m_ticket != null && (m_ticket.getTicketType().equals(TicketType.NORMAL) 
+                || m_ticket.getTicketType().equals(TicketType.INVOICE)));
         m_jPrint.setEnabled(m_ticket != null);
         
         // Este deviceticket solo tiene una impresora, la de pantalla
@@ -472,7 +475,7 @@ public class JTicketsBagTicket extends JTicketsBag {
         m_panelticketedit.showRefundLines(aRefundLines);
         
         TicketInfo refundticket = new TicketInfo();
-        refundticket.setTicketType(TicketInfo.RECEIPT_REFUND);
+        refundticket.setTicketType(TicketType.REFUND);
         refundticket.setCustomer(m_ticket.getCustomer());
         refundticket.setPayments(m_ticket.getPayments());    
 // Indicate that this a ticket in edit mode      
