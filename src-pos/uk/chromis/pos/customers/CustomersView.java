@@ -466,23 +466,17 @@ public final class CustomersView extends javax.swing.JPanel implements EditorRec
 // JG 3 Oct 2013 - Customer Transaction List
     private List<CustomerTransaction> getTransactionOfName(String name) {
 
-        List<CustomerTransaction> customerList = new ArrayList<>();
         try {
             customerTransactionList = dlSales.getCustomersTransactionList(name);
         } catch (BasicException ex) {
             Logger.getLogger(CustomersView.class.getName()).log(Level.SEVERE, null, ex);
         }
-        for (CustomerTransaction customerTransaction : customerTransactionList) {
-            String customerName = customerTransaction.getCustomerName();
-            if (customerName.equals(name)) {
-                customerList.add(customerTransaction);
-            }
-        }
+        
         txtCurdate.repaint();
         txtCurdebt.repaint();
         repaint();
         refresh();        
-        return customerList;
+        return customerTransactionList;
     }
 
     class TransactionTableModel extends AbstractTableModel {
@@ -714,18 +708,8 @@ public final class CustomersView extends javax.swing.JPanel implements EditorRec
         txtCurdate.setEditable(false);
         txtCurdate.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txtCurdate.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtCurdate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtCurdateActionPerformed(evt);
-            }
-        });
 
         jTabbedPane1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        jTabbedPane1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
-                jTabbedPane1PropertyChange(evt);
-            }
-        });
 
         jPanel1.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
 
@@ -759,11 +743,6 @@ public final class CustomersView extends javax.swing.JPanel implements EditorRec
         jLabel14.setText(AppLocal.getIntString("label.fax")); // NOI18N
 
         txtFax.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
-        txtFax.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtFaxActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -1004,11 +983,6 @@ public final class CustomersView extends javax.swing.JPanel implements EditorRec
         txtTurnover.setEditable(false);
         txtTurnover.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         txtTurnover.setHorizontalAlignment(javax.swing.JTextField.CENTER);
-        txtTurnover.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                txtTurnoverActionPerformed(evt);
-            }
-        });
 
         jLabel10.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
         jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -1131,23 +1105,6 @@ public final class CustomersView extends javax.swing.JPanel implements EditorRec
             m_Dirty.setDirty(true);
         }
     }//GEN-LAST:event_jButton3ActionPerformed
-
-    private void txtFaxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFaxActionPerformed
-
-    }//GEN-LAST:event_txtFaxActionPerformed
-
-    private void txtCurdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCurdateActionPerformed
-
-    }//GEN-LAST:event_txtCurdateActionPerformed
-
-    private void jTabbedPane1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jTabbedPane1PropertyChange
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTabbedPane1PropertyChange
-
-    private void txtTurnoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtTurnoverActionPerformed
-        
-    }//GEN-LAST:event_txtTurnoverActionPerformed
-    
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton2;
