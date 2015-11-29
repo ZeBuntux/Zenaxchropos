@@ -278,7 +278,7 @@ public class DataLogicSales extends BeanFactoryDataSingle {
                 + "STOCKCURRENT.UNITS, " //21 
                 + "ALIAS, " //22
                 + "ALWAYSAVAILABLE, " //23
-                + "DISCOUNTED, CANDISCOUNT, PACKRPRODUCT "
+                + "DISCOUNTED, CANDISCOUNT, PACKPRODUCT "
                 + "FROM STOCKCURRENT RIGHT JOIN PRODUCTS ON (STOCKCURRENT.PRODUCT = PRODUCTS.ID) "
                 + "WHERE REFERENCE = ?", SerializerWriteString.INSTANCE, ProductInfoExt.getSerializerRead()).find(sReference);
     }
