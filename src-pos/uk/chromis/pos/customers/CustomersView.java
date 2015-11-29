@@ -117,7 +117,7 @@ public final class CustomersView extends javax.swing.JPanel implements EditorRec
         a.add(0, null); // The null item
         m_CategoryModel = new ComboBoxValModel(a);
         m_jCategory.setModel(m_CategoryModel);         
-        customerTransactionList = dlSales.getCustomersTransactionList();
+        //customerTransactionList = dlSales.getCustomersTransactionList();
     }
     
     /**
@@ -467,7 +467,11 @@ public final class CustomersView extends javax.swing.JPanel implements EditorRec
     private List<CustomerTransaction> getTransactionOfName(String name) {
 
         List<CustomerTransaction> customerList = new ArrayList<>();
-
+        try {
+            customerTransactionList = dlSales.getCustomersTransactionList(name);
+        } catch (BasicException ex) {
+            Logger.getLogger(CustomersView.class.getName()).log(Level.SEVERE, null, ex);
+        }
         for (CustomerTransaction customerTransaction : customerTransactionList) {
             String customerName = customerTransaction.getCustomerName();
             if (customerName.equals(name)) {
@@ -519,10 +523,7 @@ public final class CustomersView extends javax.swing.JPanel implements EditorRec
                 case 3:
                     return customerTransaction.getUnit();
                 case 4:
-                    Double amount = customerTransaction.getTotal();
-                    DecimalFormat df = new DecimalFormat("#.##");                    
-                    String formattedAmount = df.format(amount);
-                    return formattedAmount;                            
+                    return Formats.CURRENCY.formatValue(customerTransaction.getTotal())+"  ";
                 default:
                     return "";
 
