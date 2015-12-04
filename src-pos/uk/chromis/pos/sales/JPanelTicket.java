@@ -1446,7 +1446,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
             m_oTicket.resetTaxes();
             m_oTicket.resetPayments();
         }
-
+/* Commented out due to not functioning as expected.
 // Reset the customer display here         
         String sresource = dlSystem.getResourceAsXML("Display.Message");
         DeviceTicket m_TP = new DeviceTicket(this, AppConfig.getInstance());
@@ -1459,7 +1459,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                 m_TP.getDeviceDisplay().writeVisor(AppLocal.APP_NAME, AppLocal.APP_VERSION);
             }
         }
-
+//*/
         // cancelled the ticket.total script
         // or canceled the payment dialog
         // or canceled the ticket.close script
