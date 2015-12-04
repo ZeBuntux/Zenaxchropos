@@ -66,7 +66,7 @@
         <line>
             <text align ="left" length="16" bold="true">Name</text>
             <text align ="right" length="6" bold="true">Sold</text>
-            <text align ="right" length="10" bold="true"></text>
+            <text align ="right" length="10" bold="true">Net</text>
             <text align ="right" length="10" bold="true">Total</text>
         </line>
         <line><text>------------------------------------------</text></line>
@@ -74,7 +74,7 @@
                 <line>
                     <text align ="left" length="16">${line.printCategoryName()}</text>
                     <text align ="right" length="6">${line.printCategoryUnits()}</text>
-                    <text align ="right" length="10"></text>
+                    <text align ="right" length="10">${line.printCategoryNet()}</text>
                     <text align ="right" length="10">${line.printCategorySum()}</text>
                 </line>
             #end
