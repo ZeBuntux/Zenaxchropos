@@ -464,19 +464,17 @@ public final class CustomersView extends javax.swing.JPanel implements EditorRec
 // JG 3 Oct 2013 - Customer Transaction List
     private List<CustomerTransaction> getTransactionOfName(String name) {
 
-     //   List<CustomerTransaction> customerList = new ArrayList<>();
         try {
             customerTransactionList = dlSales.getCustomersTransactionList(name);
         } catch (BasicException ex) {
             Logger.getLogger(CustomersView.class.getName()).log(Level.SEVERE, null, ex);
         }
-
+        
         txtCurdate.repaint();
         txtCurdebt.repaint();
         repaint();
         refresh();        
-
-       return customerTransactionList;
+        return customerTransactionList;
     }
 
     class TransactionTableModel extends AbstractTableModel {

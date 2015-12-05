@@ -66,7 +66,6 @@ public final class ProductsEditor extends JPanel implements EditorRecord {
     private Object pricesell;
     private boolean priceselllock = false;
     private boolean reportlock = false;
-    private BarcodeValidator validate;
 
     /**
      * Creates new form JEditProduct
