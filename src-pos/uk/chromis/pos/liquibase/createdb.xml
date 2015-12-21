@@ -1886,7 +1886,7 @@
                                  constraintName ="RES_CUST_FK_1"
                                  referencedColumnNames = "ID"
                                  baseTableName="RESERVATION_CUSTOMERS"
-                                 referencedTableName="reservations"/>
+                                 referencedTableName="RESERVATIONS"/>
 
         <addForeignKeyConstraint baseColumnNames="CUSTOMER"
                                  constraintName ="RES_CUST_FK_2"
