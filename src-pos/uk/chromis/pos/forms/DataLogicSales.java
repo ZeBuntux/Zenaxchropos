@@ -38,6 +38,15 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Logger;
 
+/*
+>> UPDATE hubbardstoycupboard eShop stock levels >>
+*/
+import java.net.URL;
+import java.io.InputStreamReader;
+/*
+<< UPDATE hubbardstoycupboard eShop stock levels >>
+*/
+
 /**
  *
  * @author adrianromero
@@ -1325,6 +1334,89 @@ public class DataLogicSales extends BeanFactoryDataSingle {
         return new SentenceExecTransaction(s) {
             @Override
             public int execInTransaction(Object params) throws BasicException {
+
+                /*
+                >> UPDATE hubbardstoycupboard eShop stock levels >>
+                */
+                try {
+                    URL url = new URL("http://publicapi.ekmpowershop22.com/v1.1/publicapi.asmx"); //ekmPowerShop
+                    java.net.HttpURLConnection conn = (java.net.HttpURLConnection) url.openConnection();
+                    conn.setRequestProperty("Host", "publicapi.ekmpowershopX.com");
+                    conn.setRequestProperty("Content-Type", "text/xml; charset=utf-8");
+                    conn.setRequestProperty("Content-Length", "200000");
+                    conn.setRequestProperty("SOAPAction", "http://publicapi.ekmpowershop.com/SetProductStock");
+                    conn.setRequestMethod("POST");
+                    conn.setDoOutput(true);
+                    conn.setDoInput(true);
+                    
+                    String user = (String)(((Object[]) params)[8]);
+                    //System.out.println("user = " + user);
+                    
+                    Object productCode = ((Object[]) params)[4];
+                    //System.out.println("productCode = " + productCode);
+                    
+                    int currentStock = (int)Math.round((findProductStock("0", "" + productCode + "", null)));
+                    //System.out.println("currentStock = " + currentStock);
+                    
+                    int stockChange = ((Object[]) params)[6] != null ? Double.valueOf(((Object[]) params)[6].toString()).intValue() : 0;
+                    //System.out.println("stockChange = " + stockChange);
+                    
+                    int newStock = currentStock + stockChange;
+                    //System.out.println("newStock1 = " + newStock);
+                    
+                    if (newStock < 0)
+                        newStock = 0;
+                    //System.out.println("newStock2 = " + newStock);
+                    
+                    if("eShop".compareTo(user) != 0 ) {
+
+                        String soapXml = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+                                + "<soap:Envelope xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+                                + "<soap:Body>"
+                                + "<SetProductStock xmlns=\"http://publicapi.ekmpowershop.com/\">"
+                                + "<SetProductStockRequest><APIKey>UchDtn3nXu6Q9Tnufkt3hfHXhd30qEApqUywq9oZWHNiBF6X1Y8II+TXRR9orpjz32XkutP/kYwC07E+I5CKHw==</APIKey>"
+                                + "<ProductCode>" + productCode + "</ProductCode>"
+                                + "<ProductStock>" + newStock + "</ProductStock>"
+                                + "</SetProductStockRequest>"
+                                + "</SetProductStock>"
+                                + "</soap:Body>"
+                                + "</soap:Envelope>";
+                        //System.out.println("String OUT " + soapXml);
+                        java.io.OutputStream os = conn.getOutputStream();
+                        java.io.OutputStreamWriter osw = new java.io.OutputStreamWriter(os);
+                        osw.write(soapXml);
+                        osw.flush();
+                        osw.close();
+
+                        java.io.InputStream is;
+                        if(conn.getResponseCode() >= 400) {
+                            is = conn.getErrorStream();
+                        }
+                        else {
+                            is = conn.getInputStream();
+                        }
+                        InputStreamReader isr = new InputStreamReader(is);
+                        java.io.BufferedReader br = new java.io.BufferedReader(isr);
+                        //String line = "";
+                        //String response = "";
+                        //while ((line = br.readLine()) != null) {
+                        //    response = response.concat(line);
+                        //}
+                        //System.out.println("RESPONSE " + response);
+                    }
+
+                } catch ( Exception e ) {
+                    e.printStackTrace();
+
+                }        
+                /*
+                << UPDATE hubbardstoycupboard eShop stock levels <<
+                */
+                
+                /*
+                >> hubbardstoycupboard use GREATEST here so stock levels do not drop below zero >>
+                */
+                /*
                 int updateresult = ((Object[]) params)[5] == null // si ATTRIBUTESETINSTANCE_ID is null
                         ? new PreparedSentence(s, "UPDATE STOCKCURRENT SET UNITS = (UNITS + ?) WHERE LOCATION = ? AND PRODUCT = ? AND ATTRIBUTESETINSTANCE_ID IS NULL", new SerializerWriteBasicExt(stockdiaryDatas, new int[]{6, 3, 4})).exec(params)
                         : new PreparedSentence(s, "UPDATE STOCKCURRENT SET UNITS = (UNITS + ?) WHERE LOCATION = ? AND PRODUCT = ? AND ATTRIBUTESETINSTANCE_ID = ?", new SerializerWriteBasicExt(stockdiaryDatas, new int[]{6, 3, 4, 5})).exec(params);
@@ -1333,6 +1425,27 @@ public class DataLogicSales extends BeanFactoryDataSingle {
                     new PreparedSentence(s, "INSERT INTO STOCKCURRENT (LOCATION, PRODUCT, ATTRIBUTESETINSTANCE_ID, UNITS) VALUES (?, ?, ?, ?)", new SerializerWriteBasicExt(stockdiaryDatas, new int[]{3, 4, 5, 6})).exec(params);
                 }
                 return new PreparedSentence(s, "INSERT INTO STOCKDIARY (ID, DATENEW, REASON, LOCATION, PRODUCT, ATTRIBUTESETINSTANCE_ID, UNITS, PRICE, AppUser) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", new SerializerWriteBasicExt(stockdiaryDatas, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8})).exec(params);
+                */
+                
+                int updateresult = ((Object[]) params)[5] == null // si ATTRIBUTESETINSTANCE_ID is null
+                    ? new PreparedSentence(s
+                        , "UPDATE STOCKCURRENT SET UNITS = GREATEST(0, (UNITS + ?)) WHERE LOCATION = ? AND PRODUCT = ? AND ATTRIBUTESETINSTANCE_ID IS NULL"
+                        , new SerializerWriteBasicExt(stockdiaryDatas, new int[] {6, 3, 4})).exec(params)
+                    : new PreparedSentence(s
+                        , "UPDATE STOCKCURRENT SET UNITS = GREATEST(0, (UNITS + ?)) WHERE LOCATION = ? AND PRODUCT = ? AND ATTRIBUTESETINSTANCE_ID = ?"
+                        , new SerializerWriteBasicExt(stockdiaryDatas, new int[] {6, 3, 4, 5})).exec(params);
+                
+                if (updateresult == 0) {
+                    new PreparedSentence(s
+                        , "INSERT INTO STOCKCURRENT (LOCATION, PRODUCT, ATTRIBUTESETINSTANCE_ID, UNITS) VALUES (?, ?, ?, GREATEST(0, ?))"
+                        , new SerializerWriteBasicExt(stockdiaryDatas, new int[] {3, 4, 5, 6})).exec(params);
+                }
+                return new PreparedSentence(s
+                    , "INSERT INTO STOCKDIARY (ID, DATENEW, REASON, LOCATION, PRODUCT, ATTRIBUTESETINSTANCE_ID, UNITS, PRICE, AppUser) VALUES (?, ?, ?, ?, ?, ?, GREATEST(0, ?), ?, ?)"
+                    , new SerializerWriteBasicExt(stockdiaryDatas, new int[] {0, 1, 2, 3, 4, 5, 6, 7, 8})).exec(params);
+                /*
+                << hubbardstoycupboard use GREATEST here so stock levels do not drop below zero <<
+                */
             }
         };
     }
