@@ -100,6 +100,8 @@ import uk.chromis.pos.promotion.DataLogicPromotions;
 import uk.chromis.pos.promotion.PromotionSupport;
 import uk.chromis.pos.util.AutoLogoff;
 
+import java.awt.Dimension;
+
 /**
  *
  * @author adrianromero
@@ -239,6 +241,7 @@ public abstract class JPanelTicket extends JPanel implements JPanelView, BeanFac
                 DeviceDisplayAdvance advDisplay = (DeviceDisplayAdvance) m_App.getDeviceTicket().getDeviceDisplay();
                 if (advDisplay.hasFeature(DeviceDisplayAdvance.TICKETLINES)) {
                     m_ticketlines2 = new JTicketLines(dlSystem.getResourceAsXML("Ticket.Line"));
+                    m_ticketlines2.setPreferredSize(new Dimension(900,450));
                     advDisplay.setTicketLines(m_ticketlines2);
                 }
                 m_ticketlines.addListSelectionListener(new ListSelectionListener() {

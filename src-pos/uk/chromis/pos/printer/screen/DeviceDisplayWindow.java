@@ -48,6 +48,7 @@ public class DeviceDisplayWindow extends javax.swing.JFrame implements DeviceDis
 
         m_jContainer.add(m_display.getDisplayComponent());
 
+        setBounds(1024,0,1280,720);
         setVisible(true);
     }
 
@@ -127,8 +128,7 @@ public class DeviceDisplayWindow extends javax.swing.JFrame implements DeviceDis
 
     @Override
     public boolean setTicketLines(JTicketLines ticketlinesPanel) {
-        setSize(967, 355 + 300);
-        m_jListContainer.setSize(700, 300);
+        setSize(1280, 280 + 450);
         m_jListContainer.add(ticketlinesPanel, java.awt.BorderLayout.CENTER);
         return true;
     }
@@ -161,13 +161,13 @@ public class DeviceDisplayWindow extends javax.swing.JFrame implements DeviceDis
         m_jContainer.setPreferredSize(new java.awt.Dimension(210, 445));
         m_jContainer.setLayout(new java.awt.BorderLayout());
 
-        m_jImage.setPreferredSize(new java.awt.Dimension(200, 200));
+        m_jImage.setPreferredSize(new java.awt.Dimension(1, 200));
         m_jContainer.add(m_jImage, java.awt.BorderLayout.LINE_END);
         m_jContainer.add(m_jListContainer, java.awt.BorderLayout.PAGE_END);
 
         getContentPane().add(m_jContainer, java.awt.BorderLayout.CENTER);
 
-        setSize(new java.awt.Dimension(967, 245));
+        setSize(new java.awt.Dimension(767, 245));
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
