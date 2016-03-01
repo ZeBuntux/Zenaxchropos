@@ -903,7 +903,7 @@ public class JPanelCSVImport extends JPanel implements JPanelView {
         }
 
         Object[] myprod = new Object[DataLogicSales.FIELD_COUNT];
-        myprod[DataLogicSales.INDEX_ID] = UUID.randomUUID().toString();                               // ID string
+        myprod[DataLogicSales.INDEX_ID] = productReference;    /* hubbards toy cupboard */                   // ID string
         myprod[DataLogicSales.INDEX_REFERENCE] = productReference;                                           // Reference string
         myprod[DataLogicSales.INDEX_CODE] = productBarcode;                                             // Barcode String
         myprod[DataLogicSales.INDEX_CODETYPE] = BarcodeValidator.BarcodeValidate(productBarcode);           // Barcode Type
