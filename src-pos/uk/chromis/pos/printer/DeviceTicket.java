@@ -117,7 +117,7 @@ public class DeviceTicket {
         String sDisplayParam1 = sd.nextToken(',');
         String sDisplayParam2 = sd.nextToken(',');
 
-        if ("serial".equals(sDisplayType) || "rxtx".equals(sDisplayType) || "file".equals(sDisplayType)) {
+        if ("serial".equals(sDisplayType) || "serialnoflow".equals(sDisplayType) || "rxtx".equals(sDisplayType) || "file".equals(sDisplayType)) {
             sDisplayParam2 = sDisplayParam1;
             sDisplayParam1 = sDisplayType;
             sDisplayType = "epson";
@@ -170,7 +170,7 @@ public class DeviceTicket {
             String sPrinterParam1 = sp.nextToken(',');
             String sPrinterParam2 = sp.nextToken(',');
 
-            if ("serial".equals(sPrinterType) || "rxtx".equals(sPrinterType) || "file".equals(sPrinterType)) {
+            if ("serial".equals(sPrinterType) || "serialnoflow".equals(sPrinterType) || "rxtx".equals(sPrinterType) || "file".equals(sPrinterType)) {
                 sPrinterParam2 = sPrinterParam1;
                 sPrinterParam1 = sPrinterType;
                 sPrinterType = "epson";
@@ -248,6 +248,10 @@ public class DeviceTicket {
                     case "serial":
                     case "rxtx":
                         pw = new PrinterWritterRXTX(port);
+                        m_apool.put(skey, pw);
+                        break;
+                    case "serialnoflow":
+                        pw = new PrinterWritterRXTX(port, 0);
                         m_apool.put(skey, pw);
                         break;
                     case "file":

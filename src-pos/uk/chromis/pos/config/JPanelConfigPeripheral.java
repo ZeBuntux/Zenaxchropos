@@ -143,6 +143,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
         jcboMachinePrinter1.addItem("javapos");
 
         jcboConnPrinter1.addItem("serial");
+        jcboConnPrinter1.addItem("serialnoflow");
         jcboConnPrinter1.addItem("file");
         jcboConnPrinter1.addItem("raw");
         jcboConnPrinter1.addItem("usb");
@@ -160,6 +161,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
         jcboMachinePrinter2.addItem("javapos");
 
         jcboConnPrinter2.addItem("serial");
+        jcboConnPrinter2.addItem("serialnoflow");
         jcboConnPrinter2.addItem("file");
         jcboConnPrinter2.addItem("raw");
         jcboConnPrinter2.addItem("usb");
@@ -177,6 +179,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
         jcboMachinePrinter3.addItem("javapos");
 
         jcboConnPrinter3.addItem("serial");
+        jcboConnPrinter3.addItem("serialnoflow");
         jcboConnPrinter3.addItem("file");
         jcboConnPrinter3.addItem("raw");
         jcboConnPrinter3.addItem("usb");
@@ -194,6 +197,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
         jcboMachinePrinter4.addItem("javapos");
 
         jcboConnPrinter4.addItem("serial");
+        jcboConnPrinter4.addItem("serialnoflow");
         jcboConnPrinter4.addItem("file");
         jcboConnPrinter4.addItem("raw");
         jcboConnPrinter4.addItem("usb");
@@ -211,6 +215,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
         jcboMachinePrinter5.addItem("javapos");
 
         jcboConnPrinter5.addItem("serial");
+        jcboConnPrinter5.addItem("serialnoflow");
         jcboConnPrinter5.addItem("file");
         jcboConnPrinter5.addItem("raw");
         jcboConnPrinter5.addItem("usb");
@@ -228,6 +233,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
         jcboMachinePrinter6.addItem("javapos");
 
         jcboConnPrinter6.addItem("serial");
+        jcboConnPrinter6.addItem("serialnoflow");
         jcboConnPrinter6.addItem("file");
         jcboConnPrinter6.addItem("raw");
         jcboConnPrinter6.addItem("usb");
@@ -242,6 +248,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
         jcboMachineDisplay.addItem("surepos");
 
         jcboConnDisplay.addItem("serial");
+        jcboConnDisplay.addItem("serialnoflow");
         jcboConnDisplay.addItem("file");
         jcboConnDisplay.addItem("raw");
         jcboConnDisplay.addItem("usb");
@@ -356,6 +363,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
 
         switch (sparam) {
             case "serial":
+            case "serialnoflow":
             case "file":
                 jcboMachinePrinter1.setSelectedItem("epson");
                 jcboConnPrinter1.setSelectedItem(sparam);
@@ -381,6 +389,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
         sparam = unifySerialInterface(p.nextToken(':'));
         switch (sparam) {
             case "serial":
+            case "serialnoflow":
             case "file":
                 jcboMachinePrinter2.setSelectedItem("epson");
                 jcboConnPrinter2.setSelectedItem(sparam);
@@ -406,6 +415,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
         sparam = unifySerialInterface(p.nextToken(':'));
         switch (sparam) {
             case "serial":
+            case "serialnoflow":
             case "file":
                 jcboMachinePrinter3.setSelectedItem("epson");
                 jcboConnPrinter3.setSelectedItem(sparam);
@@ -432,6 +442,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
         sparam = unifySerialInterface(p.nextToken(':'));
         switch (sparam) {
             case "serial":
+            case "serialnoflow":
             case "file":
                 jcboMachinePrinter4.setSelectedItem("epson");
                 jcboConnPrinter4.setSelectedItem(sparam);
@@ -457,6 +468,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
         sparam = unifySerialInterface(p.nextToken(':'));
         switch (sparam) {
             case "serial":
+            case "serialnoflow":
             case "file":
                 jcboMachinePrinter5.setSelectedItem("epson");
                 jcboConnPrinter5.setSelectedItem(sparam);
@@ -482,6 +494,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
         sparam = unifySerialInterface(p.nextToken(':'));
         switch (sparam) {
             case "serial":
+            case "serialnoflow":
             case "file":
                 jcboMachinePrinter6.setSelectedItem("epson");
                 jcboConnPrinter6.setSelectedItem(sparam);
@@ -507,6 +520,7 @@ public class JPanelConfigPeripheral extends javax.swing.JPanel implements PanelC
         sparam = unifySerialInterface(p.nextToken(':'));
         switch (sparam) {
             case "serial":
+            case "serialnoflow":
             case "file":
                 jcboMachineDisplay.setSelectedItem("epson");
                 jcboConnDisplay.setSelectedItem(sparam);

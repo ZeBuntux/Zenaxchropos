@@ -41,15 +41,26 @@ public class PrinterWritterRXTX extends PrinterWritter /* implements SerialPortE
     
     private String m_sPortPrinter;
     private OutputStream m_out;
+    private int m_flowcontrol;
     
     /** Creates a new instance of PrinterWritterComm
      * @param sPortPrinter
      * @throws uk.chromis.pos.printer.TicketPrinterException */
     public PrinterWritterRXTX(String sPortPrinter) throws TicketPrinterException {
         m_sPortPrinter = sPortPrinter;
-        m_out = null; 
+        m_out = null;
+	m_flowcontrol = 1;
     }
     
+    /** Creates a new instance of PrinterWritterComm
+     * @param sPortPrinter
+     * @throws uk.chromis.pos.printer.TicketPrinterException */
+    public PrinterWritterRXTX(String sPortPrinter, int flowcontrol) throws TicketPrinterException {
+        m_sPortPrinter = sPortPrinter;
+        m_out = null;
+	m_flowcontrol = flowcontrol;
+    }
+
     /**
      *
      * @param data
@@ -59,25 +70,21 @@ public class PrinterWritterRXTX extends PrinterWritter /* implements SerialPortE
         try {  
             if (m_out == null) {
                 m_PortIdPrinter = CommPortIdentifier.getPortIdentifier(m_sPortPrinter); // Tomamos el puerto                   
-                m_CommPortPrinter = m_PortIdPrinter.open("PORTID", 2000); // Abrimos el puerto       
-
+                m_CommPortPrinter = m_PortIdPrinter.open("PORTID", 10000); // Abrimos el puerto       
                 m_out = m_CommPortPrinter.getOutputStream(); // Tomamos el chorro de escritura   
-
                 if (m_PortIdPrinter.getPortType() == CommPortIdentifier.PORT_SERIAL) {
                     ((SerialPort)m_CommPortPrinter).setSerialPortParams(9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE); // Configuramos el puerto
-                    ((SerialPort)m_CommPortPrinter).setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN);  // this line prevents the printer tmu220 to stop printing after +-18 lines printed
-                    // this line prevents the printer tmu220 to stop printing after +-18 lines printed. Bug 8324
-                    // But if added a regression error appears. Bug 9417, Better to keep it commented.
-                    // ((SerialPort)m_CommPortPrinter).setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN);
-    // Not needed to set parallel properties
-    //                } else if (m_PortIdPrinter.getPortType() == CommPortIdentifier.PORT_PARALLEL) {
-    //                    ((ParallelPort)m_CommPortPrinter).setMode(1);
-
+                    if (m_flowcontrol == 1) {
+                	((SerialPort)m_CommPortPrinter).setFlowControlMode(SerialPort.FLOWCONTROL_RTSCTS_IN);  // this line prevents the printer tmu220 to stop printing after +-18 lines printed
+                    }
                 }
             }
             m_out.write(data);
+            //String str = new String(data, "UTF-8");
+            //System.out.println("Display write "+str);
         } catch (NoSuchPortException | PortInUseException | UnsupportedCommOperationException | IOException e) {
             System.err.println(e);
+            System.out.println(e);
         }      
     }
     
