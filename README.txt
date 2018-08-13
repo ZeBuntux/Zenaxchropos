@@ -4,7 +4,7 @@ Release:v0.56
 Moved main locales out of country folders
 Fixes to dialogbox when using dark colour themes.
 Updated some of the locales files with updates provided by users
-Updated Migration routine uses new process and cover the latest version, added progress bar
+Updated Migration routine uses new process and covers the latest version, added progress bar
 Added fix from Wildfox coder for CSV import
 Allow reset of pickup ID within application
 Added custom error sound option, modified from John B code
@@ -25,7 +25,7 @@ Refactor of columms in Derby database to resolve the foreign key issue, which is
 size, in databases that are converted.
 
 Added recipes (formally product kit).
-Improved barcode printign routine to allow the software to use graphics for barcodes not supported by the 
+Improved barcode printing routine to allow the software to use graphics for barcodes not supported by the 
 printer.
 
 ***********************************************************************************************************
@@ -106,7 +106,7 @@ Features
 - All reports have been moved out of the jar file, making it easier to add your own reports or
   customize existing reports.
 - Reports now load dynamically, based upon database type.
-- Fixed some reports that did not work with all database version.
+- Fixed some reports that did not work with all database versions.
 - All locales have been moved from the jar file, allowing easier editing.
 - Change Icon colours from the configuration panel.
 - Added new event for scripts 'ticket.save'
@@ -125,7 +125,7 @@ Features
 2nd December
 Release: v0.53.3
 
-This changes the resources, to match new tickettype, which make the scripts more readable. In version v0.32.3 
+This changes the resources, to match new tickettype, which makes the scripts more readable. In version v0.32.3 
 these scripts are converted automatically.
 
 The conversion can be run manually, if required by running resettickettype from the Chomis program folder.
@@ -161,22 +161,22 @@ Release: v0.53
 Bug #16	variable price, product screen display affected only, now resolved
 Bug #15 Delete freshly added products - Thanks Wildfox coder
 Bug #14 CSV import updated and resolved
-Bug #17 Refund bug inherited from Unicenta and Openbravo, user can refund dame recipt multiple times
+Bug #17 Refund bug inherited from Unicenta and Openbravo, user can refund same receipt multiple times
 Bug #9  CustomerView generates insert & Update on load - thanks tsmi
 
 
 * Included new CSV import - Thanks Wildfox coder
-* Refactor of derby database code, since derby 10.10.20 they boolean function changed. to use true/false
-  rather than 1/0. Table changed to allow the new fucntion.
+* Refactor of derby database code, since derby 10.10.20 the boolean function changed. to use true/false
+  rather than 1/0. Table changed to allow the new function.
 * Addition of pack product feature from John Barrett, including new table ready for stock app import.
 * Barcode changed to allow ISBn-13 codes to be recognized.
 * Migrate routine updated to allow for new changes.
 * New event script added 'ticket.pretotals' this runs before the totals are displayed on the screen.
 * Display.consolidation updated  
 	display.consolidatedwithoutprice if true does not use price when consolidating on screen tickets 
-	only workis if display.consolidated=true, to switch on on screen consolidation
+	only works if display.consolidated=true, to switch on screen consolidation
 * Option to hide the default product popup
-* Added usb to print options, works the same way as raw, except it make it easier to implement
+* Added usb to print options, works the same way as raw, except it makes it easier to implement
 
 *********************************************************************************************************** 
 18th October
@@ -189,14 +189,14 @@ Bug #10 - Barcode printing, issue printing some barcode type in reports - fixed
 
 Automatic barcode type recognition routine added. When a product is saved the type 
 of barcode is calculated using some basic formulas
-* if it contains no numeric characters, is is flagged as CODE128
+* if it contains no numeric characters, it is flagged as CODE128
 * 7 digits with correct checksum - UPC-E
 * 8 digits with correct checksum - EAN-8
 * 12 digits with correct checksum - UPC-A
 * 13 digits with correct checksum - EAN-13
 * 14 digits with correct checksum - GTIN
 
-Any code above with the incorrect checksum if defined as null, this is is required as 
+Any code above with the incorrect checksum if defined as null, this is required as 
 some scanners will reject the code. This is not used for general scanning only when 
 printing reports.
 Drag'n'drop images into chromis for stock records.
@@ -208,12 +208,12 @@ Merged changes from John Barrett in to the main code.
 21st September 2015
 Release: v0.51
 
-Fixed SQL errors in Convert and it now informs the the user of its progress via a progress bar.
+Fixed SQL errors in Convert and it now informs the user of its progress via a progress bar.
 
 
 * Default Icon colours changed.
-* Added the ability for the user to change the colout of the icons. Located in the install folder
-  is folder called icon sets, copy the the required jar to the lIb folder to changethe colours
+* Added the ability for the user to change the colour of the icons. Located in the install folder
+  is folder called icon sets, copy the required jar to the lib folder to change the colours
 * Identified bug in look and feel, unrequired lib file, now fixed
 * Found issue of missing field in products when coming from 3.70  - fixed
 * Found issue with rightslevel moving from 3.70 - fixed
@@ -222,7 +222,7 @@ Fixed SQL errors in Convert and it now informs the the user of its progress via 
 * Text version of permissions now deactivated by default, On custom permissions will need to be added 
   to the database.
 * Started to tidy the message dialog boxes.
-* The main bug is fix in variable barcodes, these have now been written to comply with GS1 UK & GS1 US. 
+* The main bug is fixed in variable barcodes, these have now been written to comply with GS1 UK & GS1 US. 
   Included is a pdf which explains how these barcodes work and how to set them up correctly in Chromis.
 * Plus a number of bug fixes supplied by John Barrett, thanks John.
 
